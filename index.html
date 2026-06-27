@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Pro Calculator</title>
+    <link rel="manifest" href="manifest.json">
+    <style>
+        :root {
+            --bg-color: #121212;
+            --calc-bg: rgba(30, 30, 30, 0.75);
+            --btn-bg: #2d2d2d;
+            --btn-hover: #3d3d3d;
+            --accent: #0078D4;
+            --text: #ffffff;
+        }
+        body { 
+            display: flex; justify-content: center; align-items: center; 
+            height: 100vh; background-color: var(--bg-color); 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0;
+            background-image: linear-gradient(135deg, #1f1c2c 0%, #928dab 100%);
+        }
+        .calculator { 
+            background: var(--calc-bg); padding: 25px; 
+            border-radius: 15px; width: 340px; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        #display { 
+            width: 100%; height: 70px; font-size: 36px; 
+            text-align: right; margin-bottom: 25px; 
+            background: transparent; color: var(--text);
+            border: none; outline: none; 
+            border-bottom: 2px solid var(--accent);
+            box-sizing: border-box;
+        }
+        .buttons { 
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; 
+        }
+        button { 
+            padding: 18px 0; font-size: 20px; cursor: pointer; 
+            background: var(--btn-bg); color: var(--text);
+            border: none; border-radius: 8px; transition: background 0.2s, transform 0.1s;
+        }
+        button:hover { background: var(--btn-hover); }
+        button:active { transform: scale(0.95); }
+        
+        .operator { background: #ff9800; color: #fff; font-weight: bold; }
+        .operator:hover { background: #e68a00; }
+        
+        .equal { background: var(--accent); grid-column: span 2; font-weight: bold;}
+        .equal:hover { background: #005a9e; }
+        
+        .scientific { background: #1a1a1a; font-size: 16px; color: #4fc3f7; }
+        .scientific:hover { background: #2a2a2a; }
+        
+        .action-btn { color: #ff5252; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" disabled>
+        <div class="buttons">
+            <button class="scientific" onclick="appendFn('Math.sin(')">sin</button>
+            <button class="scientific" onclick="appendFn('Math.cos(')">cos</button>
+            <button class="scientific" onclick="appendFn('Math.tan(')">tan</button>
+            <button class="scientific" onclick="appendFn('Math.PI')">π</button>
+            
+            <button class="scientific" onclick="appendFn('Math.sqrt(')">√</button>
+            <button class="scientific" onclick="appendToDisplay('**')">x^y</button>
+            <button class="action-btn" onclick="clearDisplay()">C</button>
+            <button class="action-btn" onclick="deleteLast()">DEL</button>
+            
+            <button onclick="appendToDisplay('7')">7</button>
+            <button onclick="appendToDisplay('8')">8</button>
+            <button onclick="appendToDisplay('9')">9</button>
+            <button class="operator" onclick="appendToDisplay('/')">÷</button>
+            
+            <button onclick="appendToDisplay('4')">4</button>
+            <button onclick="appendToDisplay('5')">5</button>
+            <button onclick="appendToDisplay('6')">6</button>
+            <button class="operator" onclick="appendToDisplay('*')">×</button>
+            
+            <button onclick="appendToDisplay('1')">1</button>
+            <button onclick="appendToDisplay('2')">2</button>
+            <button onclick="appendToDisplay('3')">3</button>
+            <button class="operator" onclick="appendToDisplay('-')">-</button>
+            
+            <button onclick="appendToDisplay('.')">.</button>
+            <button onclick="appendToDisplay('0')">0</button>
+            <button class="equal" onclick="calculate()">=</button>
+            <button class="operator" onclick="appendToDisplay('+')">+</button>
+        </div>
+    </div>
+    <script>
+        const display = document.getElementById('display');
+        
+        function appendToDisplay(val) { 
+            display.value += val; 
+        }
+        
+        function appendFn(fn) { 
+            display.value += fn; 
+        }
+        
+        function clearDisplay() { 
+            display.value = ''; 
+        }
+        
+        function deleteLast() { 
+            display.value = display.value.slice(0, -1); 
+        }
+        
+        function calculate() { 
+            try { 
+                let expression = display.value;
+                if (!expression) return;
+                
+                let result = eval(expression);
+                
+                // Limit decimal places for clean UI
+                display.value = Number.isInteger(result) ? result : parseFloat(result.toFixed(6));
+            } catch { 
+                display.value = 'Error'; 
+                setTimeout(clearDisplay, 1200);
+            } 
+        }
+
+        // Keyboard Support
+        document.addEventListener('keydown', (e) => {
+            const key = e.key;
+            if(/[0-9\.\+\-\*\/]/.test(key)) appendToDisplay(key);
+            if(key === 'Enter') { e.preventDefault(); calculate(); }
+            if(key === 'Backspace') deleteLast();
+            if(key === 'Escape') clearDisplay();
+        });
+    </script>
+</body>
+</html>
